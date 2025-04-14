@@ -39,6 +39,10 @@ class Manga
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'mangas')]
     private Collection $Tags;
 
+    #[ORM\ManyToOne(inversedBy: 'mangas')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
+
     public function __construct()
     {
         $this->Tags = new ArrayCollection();
@@ -138,6 +142,18 @@ class Manga
     public function removeTag(Tag $tag): static
     {
         $this->Tags->removeElement($tag);
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

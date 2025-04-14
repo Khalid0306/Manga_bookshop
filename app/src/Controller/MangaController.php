@@ -19,8 +19,11 @@ final class MangaController extends AbstractController
     #[Route(name: 'app_manga_index', methods: ['GET'])]
     public function index(MangaRepository $mangaRepository): Response
     {
+        // Récupérer uniquement les mangas de l'utilisateur connecté
+        $user = $this->getUser();
+        
         return $this->render('manga/index.html.twig', [
-            'mangas' => $mangaRepository->findAll(),
+            'mangas' => $mangaRepository->findBy(['owner' => $user]),
         ]);
     }
 
@@ -28,6 +31,9 @@ final class MangaController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $manga = new Manga();
+        // Définir l'utilisateur connecté comme propriétaire
+        $manga->setOwner($this->getUser());
+        
         $form = $this->createForm(MangaType::class, $manga);
         $form->handleRequest($request);
 
@@ -47,6 +53,9 @@ final class MangaController extends AbstractController
     #[Route('/manga/{id}', name: 'app_manga_show', methods: ['GET'])]
     public function show(Manga $manga): Response
     {
+        // Vérifier que l'utilisateur est le propriétaire
+        $this->denyAccessUnlessGranted('view', $manga);
+        
         return $this->render('manga/show.html.twig', [
             'manga' => $manga,
         ]);
@@ -55,6 +64,9 @@ final class MangaController extends AbstractController
     #[Route('/manga/{id}/edit', name: 'app_manga_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Manga $manga, EntityManagerInterface $entityManager): Response
     {
+        // Vérifier que l'utilisateur est le propriétaire
+        $this->denyAccessUnlessGranted('edit', $manga);
+        
         $form = $this->createForm(MangaType::class, $manga);
         $form->handleRequest($request);
 
@@ -73,6 +85,9 @@ final class MangaController extends AbstractController
     #[Route('/manga/{id}', name: 'app_manga_delete', methods: ['POST'])]
     public function delete(Request $request, Manga $manga, EntityManagerInterface $entityManager): Response
     {
+        // Vérifier que l'utilisateur est le propriétaire
+        $this->denyAccessUnlessGranted('delete', $manga);
+        
         if ($this->isCsrfTokenValid('delete'.$manga->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($manga);
             $entityManager->flush();

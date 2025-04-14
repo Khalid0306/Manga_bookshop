@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -32,6 +34,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, Manga>
+     */
+    #[ORM\OneToMany(targetEntity: Manga::class, mappedBy: 'owner')]
+    private Collection $mangas;
+
+    public function __construct()
+    {
+        $this->mangas = new ArrayCollection();
+        $this->roles = ['ROLE_USER'];
+    }
 
     public function getId(): ?int
     {
@@ -106,5 +120,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Manga>
+     */
+    public function getMangas(): Collection
+    {
+        return $this->mangas;
+    }
+
+    public function addManga(Manga $manga): static
+    {
+        if (!$this->mangas->contains($manga)) {
+            $this->mangas->add($manga);
+            $manga->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManga(Manga $manga): static
+    {
+        if ($this->mangas->removeElement($manga)) {
+            // set the owning side to null (unless already changed)
+            if ($manga->getOwner() === $this) {
+                $manga->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }
