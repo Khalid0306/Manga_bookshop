@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Manga;
 use App\Form\MangaType;
+use App\Form\MangaSearchType;
 use App\Repository\MangaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,13 +18,25 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MangaController extends AbstractController
 {
     #[Route(name: 'app_manga_index', methods: ['GET'])]
-    public function index(MangaRepository $mangaRepository): Response
+    public function index(Request $request, MangaRepository $mangaRepository): Response
     {
-        // Récupérer uniquement les mangas de l'utilisateur connecté
+        $searchForm = $this->createForm(MangaSearchType::class);
+        $searchForm->handleRequest($request);
+        
         $user = $this->getUser();
+        $mangas = [];
+        
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+            // Si un formulaire de recherche est soumis, utiliser les critères pour filtrer
+            $mangas = $mangaRepository->findBySearch($request->query->all(), $user);
+        } else {
+            // Sinon, afficher tous les mangas de l'utilisateur
+            $mangas = $mangaRepository->findBy(['owner' => $user]);
+        }
         
         return $this->render('manga/index.html.twig', [
-            'mangas' => $mangaRepository->findBy(['owner' => $user]),
+            'mangas' => $mangas,
+            'searchForm' => $searchForm->createView(),
         ]);
     }
 

@@ -1,4 +1,16 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    <div class="form-fields">
+        {{ form_row(form.title) }}
+        {{ form_row(form.price) }}
+        {{ form_row(form.category) }}
+        
+        <div class="tags-section">
+            <p><strong>{{ form_label(form.tags) }}</strong></p>
+            <div class="tags-container">
+                {{ form_widget(form.tags) }}
+            </div>
+            {{ form_errors(form.tags) }}
+        </div>
+    </div>
     <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}

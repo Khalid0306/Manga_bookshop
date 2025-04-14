@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Manga;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -15,29 +17,44 @@ class MangaRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Manga::class);
     }
-
-    //    /**
-    //     * @return Manga[] Returns an array of Manga objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Manga
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    
+    /**
+     * Recherche de mangas avec filtres
+     */
+    public function findBySearch(array $criteria, User $owner): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->join('m.category', 'c')
+            ->leftJoin('m.Tags', 't')
+            ->where('m.owner = :owner')
+            ->setParameter('owner', $owner)
+            ->orderBy('m.title', 'ASC');
+            
+        if (!empty($criteria['title'])) {
+            $qb->andWhere('m.title LIKE :title')
+               ->setParameter('title', '%' . $criteria['title'] . '%');
+        }
+        
+        if (!empty($criteria['minPrice'])) {
+            $qb->andWhere('m.price >= :minPrice')
+               ->setParameter('minPrice', $criteria['minPrice']);
+        }
+        
+        if (!empty($criteria['maxPrice'])) {
+            $qb->andWhere('m.price <= :maxPrice')
+               ->setParameter('maxPrice', $criteria['maxPrice']);
+        }
+        
+        if (!empty($criteria['category'])) {
+            $qb->andWhere('m.category = :category')
+               ->setParameter('category', $criteria['category']);
+        }
+        
+        if (!empty($criteria['tags'])) {
+            $qb->andWhere('t.id IN (:tags)')
+               ->setParameter('tags', $criteria['tags']);
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
 }

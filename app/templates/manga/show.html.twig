@@ -2,8 +2,75 @@
 
 {% block title %}Manga{% endblock %}
 
+{% block stylesheets %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+            width: 200px;
+        }
+        .tag {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .navigation {
+            margin-top: 20px;
+        }
+        .navigation a, .btn {
+            display: inline-block;
+            margin-right: 10px;
+            text-decoration: none;
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        .navigation a:hover, .btn:hover {
+            background: #45a049;
+        }
+        .navigation a.edit {
+            background: #2196F3;
+        }
+        .navigation a.edit:hover {
+            background: #0b7dda;
+        }
+        .delete-form {
+            display: inline-block;
+        }
+        .delete-form .btn {
+            background: #f44336;
+        }
+        .delete-form .btn:hover {
+            background: #d32f2f;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Manga</h1>
+    <h1>Manga: {{ manga.title }}</h1>
 
     <table class="table">
         <tbody>
@@ -20,6 +87,22 @@
                 <td>{{ manga.price }}</td>
             </tr>
             <tr>
+                <th>Category</th>
+                <td>{{ manga.category.label }}</td>
+            </tr>
+            <tr>
+                <th>Tags</th>
+                <td>
+                    {% if manga.tags|length > 0 %}
+                        {% for tag in manga.tags %}
+                            <span class="tag">{{ tag.name }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <em>No tags</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
                 <th>CreatedAt</th>
                 <td>{{ manga.createdAt ? manga.createdAt|date('Y-m-d') : '' }}</td>
             </tr>
@@ -30,9 +113,11 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_manga_index') }}">back to list</a>
-
-    <a href="{{ path('app_manga_edit', {'id': manga.id}) }}">edit</a>
-
-    {{ include('manga/_delete_form.html.twig') }}
+    <div class="navigation">
+        <a href="{{ path('app_manga_index') }}">back to list</a>
+        <a href="{{ path('app_manga_edit', {'id': manga.id}) }}" class="edit">edit</a>
+        <div class="delete-form">
+            {{ include('manga/_delete_form.html.twig') }}
+        </div>
+    </div>
 {% endblock %}
