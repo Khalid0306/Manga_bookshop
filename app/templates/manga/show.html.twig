@@ -1,123 +1,62 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Manga{% endblock %}
-
-{% block stylesheets %}
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        table th {
-            background-color: #f2f2f2;
-            width: 200px;
-        }
-        .tag {
-            display: inline-block;
-            background: #e0e0e0;
-            padding: 5px 10px;
-            border-radius: 15px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-        .navigation {
-            margin-top: 20px;
-        }
-        .navigation a, .btn {
-            display: inline-block;
-            margin-right: 10px;
-            text-decoration: none;
-            padding: 8px 15px;
-            background: #4CAF50;
-            color: white;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-        }
-        .navigation a:hover, .btn:hover {
-            background: #45a049;
-        }
-        .navigation a.edit {
-            background: #2196F3;
-        }
-        .navigation a.edit:hover {
-            background: #0b7dda;
-        }
-        .delete-form {
-            display: inline-block;
-        }
-        .delete-form .btn {
-            background: #f44336;
-        }
-        .delete-form .btn:hover {
-            background: #d32f2f;
-        }
-    </style>
-{% endblock %}
+{% block title %}{{ manga.title }}{% endblock %}
 
 {% block body %}
-    <h1>Manga: {{ manga.title }}</h1>
-
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ manga.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ manga.title }}</td>
-            </tr>
-            <tr>
-                <th>Price</th>
-                <td>{{ manga.price }}</td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td>{{ manga.category.label }}</td>
-            </tr>
-            <tr>
-                <th>Tags</th>
-                <td>
-                    {% if manga.tags|length > 0 %}
-                        {% for tag in manga.tags %}
-                            <span class="tag">{{ tag.name }}</span>
-                        {% endfor %}
-                    {% else %}
-                        <em>No tags</em>
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ manga.createdAt ? manga.createdAt|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdateAt</th>
-                <td>{{ manga.updateAt ? manga.updateAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="navigation">
-        <a href="{{ path('app_manga_index') }}">back to list</a>
-        <a href="{{ path('app_manga_edit', {'id': manga.id}) }}" class="edit">edit</a>
-        <div class="delete-form">
+    <div class="manga-header">
+        <h1>{{ manga.title }}</h1>
+        <div class="action-buttons">
+            <a href="{{ path('app_manga_index') }}" class="btn btn-secondary">Back to list</a>
+            <a href="{{ path('app_manga_edit', {'id': manga.id}) }}" class="btn btn-primary">Edit</a>
             {{ include('manga/_delete_form.html.twig') }}
+        </div>
+    </div>
+
+    <div class="manga-detail">
+        <div class="manga-info">
+            <div class="manga-info-header">
+                <h2>Manga Details</h2>
+            </div>
+            <div class="manga-info-body">
+                <div class="manga-info-item">
+                    <div class="manga-info-label">ID</div>
+                    <div class="manga-info-value">{{ manga.id }}</div>
+                </div>
+                <div class="manga-info-item">
+                    <div class="manga-info-label">Title</div>
+                    <div class="manga-info-value">{{ manga.title }}</div>
+                </div>
+                <div class="manga-info-item">
+                    <div class="manga-info-label">Price</div>
+                    <div class="manga-info-value text-primary">{{ manga.price }} €</div>
+                </div>
+                <div class="manga-info-item">
+                    <div class="manga-info-label">Category</div>
+                    <div class="manga-info-value"><span class="manga-category">{{ manga.category.label }}</span></div>
+                </div>
+                <div class="manga-info-item">
+                    <div class="manga-info-label">Tags</div>
+                    <div class="manga-info-value">
+                        <div class="manga-tags">
+                            {% if manga.tags|length > 0 %}
+                                {% for tag in manga.tags %}
+                                    <span class="tag">{{ tag.name }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <em>No tags</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="manga-info-item">
+                    <div class="manga-info-label">Created At</div>
+                    <div class="manga-info-value">{{ manga.createdAt ? manga.createdAt|date('Y-m-d') : '' }}</div>
+                </div>
+                <div class="manga-info-item">
+                    <div class="manga-info-label">Last Updated</div>
+                    <div class="manga-info-value">{{ manga.updateAt ? manga.updateAt|date('Y-m-d H:i:s') : '' }}</div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -5,77 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        <style>
-            /* Styles communs pour toute l'application */
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f9f9f9;
-            }
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 20px;
-            }
-            header {
-                background-color: #3498db;
-                color: white;
-                padding: 15px 0;
-                margin-bottom: 20px;
-            }
-            header .container {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            header h1 {
-                margin: 0;
-                font-size: 1.8em;
-            }
-            nav ul {
-                list-style: none;
-                display: flex;
-                margin: 0;
-                padding: 0;
-            }
-            nav li {
-                margin-left: 20px;
-            }
-            nav a {
-                color: white;
-                text-decoration: none;
-            }
-            nav a:hover {
-                text-decoration: underline;
-            }
-            footer {
-                margin-top: 40px;
-                padding: 20px 0;
-                background-color: #333;
-                color: white;
-                text-align: center;
-            }
-            .flash-messages {
-                margin-bottom: 20px;
-            }
-            .flash-success {
-                background-color: #dff0d8;
-                border: 1px solid #d6e9c6;
-                color: #3c763d;
-                padding: 15px;
-                border-radius: 4px;
-                margin-bottom: 10px;
-            }
-            .flash-error {
-                background-color: #f2dede;
-                border: 1px solid #ebccd1;
-                color: #a94442;
-                padding: 15px;
-                border-radius: 4px;
-                margin-bottom: 10px;
-            }
-        </style>
+        
+        {# Ajouter le lien vers le fichier CSS externe #}
+        <link rel="stylesheet" href="/css/style.css">
+        
         {% block stylesheets %}
         {% endblock %}
 
@@ -85,42 +18,57 @@
     </head>
     <body>
         <header>
-            <div class="container">
-                <h1>Manga Collection</h1>
+            <div class="container header-inner">
+                <div class="logo">
+                    <a href="{{ path('app_manga_index') }}">Manga Collection</a>
+                </div>
                 <nav>
                     <ul>
-                        <li><a href="{{ path('app_manga_index') }}">Home</a></li>
+                        <li><a href="{{ path('app_manga_index') }}" class="{{ app.request.get('_route') == 'app_manga_index' ? 'active' : '' }}">Home</a></li>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <li><a href="{{ path('admin') }}">Admin</a></li>
+                            <li><a href="{{ path('admin') }}" class="{{ app.request.get('_route') starts with 'admin' ? 'active' : '' }}">Admin</a></li>
                         {% endif %}
                         {% if app.user %}
                             <li><a href="{{ path('app_logout') }}">Logout</a></li>
                         {% else %}
-                            <li><a href="{{ path('app_login') }}">Login</a></li>
-                            <li><a href="{{ path('app_register') }}">Register</a></li>
+                            <li><a href="{{ path('app_login') }}" class="{{ app.request.get('_route') == 'app_login' ? 'active' : '' }}">Login</a></li>
+                            <li><a href="{{ path('app_register') }}" class="{{ app.request.get('_route') == 'app_register' ? 'active' : '' }}">Register</a></li>
                         {% endif %}
                     </ul>
                 </nav>
             </div>
         </header>
 
-        <div class="container">
-            {% for label, messages in app.flashes %}
-                <div class="flash-messages">
-                    {% for message in messages %}
-                        <div class="flash-{{ label }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
+        <main>
+            <div class="container">
+                {% for label, messages in app.flashes %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-{{ label }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
 
-            {% block body %}{% endblock %}
-        </div>
+                {% block body %}{% endblock %}
+            </div>
+        </main>
 
         <footer>
-            <div class="container">
-                <p>&copy; {{ "now"|date("Y") }} - Manga Collection App</p>
+            <div class="container footer-content">
+                <div class="footer-logo">Manga Collection</div>
+                <div class="footer-links">
+                    <a href="{{ path('app_manga_index') }}">Home</a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin') }}">Admin</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container">
+                    <p>&copy; {{ "now"|date("Y") }} - Manga Collection App</p>
+                </div>
             </div>
         </footer>
     </body>
