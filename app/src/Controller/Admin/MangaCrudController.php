@@ -28,7 +28,10 @@ class MangaCrudController extends AbstractCrudController
             AssociationField::new('category')
                 // ->setCrudController(CategoryCrudController::class)
                 ->setRequired(true) 
-                ->autocomplete(), 
+                ->autocomplete(),
+            AssociationField::new('tags')
+                ->setFormTypeOption('by_reference', false)
+                ->autocomplete(),
             DateTimeField::new('createdAt')->hideOnForm(),
             DateTimeField::new('updateAt')->hideOnForm()
         ];

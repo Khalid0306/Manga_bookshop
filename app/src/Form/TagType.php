@@ -4,25 +4,26 @@ namespace App\Form;
 
 use App\Entity\Manga;
 use App\Entity\Tag;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-class MangaType extends AbstractType
+class TagType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title')
-            ->add('price')
-            ->add('category')
-            ->add('tags', EntityType::class, [
-                'class' => Tag::class,
-                'choice_label' => 'name',
+            ->add('name', null, [
+                'label' => 'Nom du tag'
+            ])
+            ->add('mangas', EntityType::class, [
+                'class' => Manga::class,
+                'choice_label' => 'title',
                 'multiple' => true,
                 'expanded' => true,
                 'required' => false,
+                'label' => 'Mangas associés'
             ])
         ;
     }
@@ -30,7 +31,7 @@ class MangaType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Manga::class,
+            'data_class' => Tag::class,
         ]);
     }
 }
